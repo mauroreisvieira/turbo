@@ -14,7 +14,7 @@ builds:
       - -trimpath
       - -buildmode=c-archive
     ldflags:
-      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser -linkmode external -extldflags "-static"
     mod_timestamp: "{{ .CommitTimestamp }}"
     env:
       - CGO_ENABLED=1
