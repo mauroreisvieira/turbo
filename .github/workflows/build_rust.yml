@@ -37,11 +37,7 @@ jobs:
       - name: Build release binary
         run: cargo build --release -p turbo --target x86_64-unknown-linux-musl
       - name: Strip binary from debug symbols
-        run: strip target/x86_64-unknown-linux-musl/release/fnm
-      - uses: actions/upload-artifact@v3
-        with:
-          name: fnm-linux
-          path: target/x86_64-unknown-linux-musl/release/fnm
+        run: strip target/x86_64-unknown-linux-musl/release/turbo
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
