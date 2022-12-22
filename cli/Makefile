@@ -97,25 +97,37 @@ build: install
 prepublish: compile-protos cmd/turbo/version.go
 	make -j3 bench/turbo test-go
 
-.PHONY: publish-turbo-cross
-publish-turbo-cross: prepublish
-	goreleaser release --rm-dist -f cross-release.yml
-
 .PHONY: publish-turbo-darwin
 publish-turbo-darwin: prepublish
 	goreleaser release --rm-dist -f darwin-release.yml
 
-.PHONY: snapshot-turbo-cross
-snapshot-turbo-cross:
-	goreleaser release --snapshot --rm-dist -f cross-release.yml
+.PHONY: publish-turbo-alpine
+publish-turbo-alpine: prepublish
+	goreleaser release --rm-dist -f alpine-release.yml
+
+.PHONY: publish-turbo-cross
+publish-turbo-cross: prepublish
+	goreleaser release --rm-dist -f cross-release.yml
 
 .PHONY: snapshot-turbo-darwin
 snapshot-turbo-darwin:
 	goreleaser release --snapshot --rm-dist -f darwin-release.yml
 
+.PHONY: snapshot-turbo-alpine
+snapshot-turbo-alpine:
+	goreleaser release --snapshot --rm-dist -f alpine-release.yml
+
+.PHONY: snapshot-turbo-cross
+snapshot-turbo-cross:
+	goreleaser release --snapshot --rm-dist -f cross-release.yml
+
 .PHONY: snapshot-lib-turbo-darwin
 snapshot-lib-turbo-darwin:
 	goreleaser release --snapshot --rm-dist -f darwin-lib.yml
+
+.PHONY: snapshot-lib-turbo-alpine
+snapshot-lib-turbo-alpine:
+	goreleaser release --snapshot --rm-dist -f alpine-lib.yml
 
 .PHONY: snapshot-lib-turbo-cross
 snapshot-lib-turbo-cross:
@@ -124,6 +136,10 @@ snapshot-lib-turbo-cross:
 .PHONY: build-lib-turbo-darwin
 build-lib-turbo-darwin:
 	goreleaser release --rm-dist -f darwin-lib.yml
+
+.PHONY: build-lib-turbo-alpine
+build-lib-turbo-alpine:
+	goreleaser release --rm-dist -f alpine-lib.yml
 
 .PHONY: build-lib-turbo-cross
 build-lib-turbo-cross:
@@ -137,7 +153,6 @@ stage-release: cmd/turbo/version.go
 	cat $(CLI_DIR)/../version.txt
 	git diff -- $(CLI_DIR)/../version.txt
 	git status
-	@test main = "`git rev-parse --abbrev-ref HEAD`" || (echo "Refusing to publish from non-main branch `git rev-parse --abbrev-ref HEAD`" && false)
 	@test "" = "`git cherry`" || (echo "Refusing to publish with unpushed commits" && false)
 
 	# Stop if versions are not updated.
@@ -290,4 +305,3 @@ testbed-%:
 	rm -rf testbed
 	mkdir -p testbed
 	./integration_tests/$($@_TEST)/setup.sh testbed
-

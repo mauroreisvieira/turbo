@@ -10,70 +10,69 @@ on:
         description: "Staging branch to run release from"
 
 jobs:
-  smoke-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.release_branch }}
-      - uses: ./.github/actions/setup-node
-        with:
-          enable-corepack: false
-      - uses: ./.github/actions/setup-go
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Test
-        run: pnpm -- turbo run test --filter=cli --color
+  # smoke-test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         ref: ${{ inputs.release_branch }}
+  #     - uses: ./.github/actions/setup-node
+  #       with:
+  #         enable-corepack: false
+  #     - uses: ./.github/actions/setup-go
+  #       with:
+  #         github-token: "${{ secrets.GITHUB_TOKEN }}"
+  #     - name: Test
+  #       run: pnpm -- turbo run test --filter=cli --color
 
-  darwin:
-    needs: [smoke-test]
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.release_branch }}
-      - run: git fetch origin --tags
-      - uses: ./.github/actions/setup-node
-        with:
-          enable-corepack: false
-      - uses: ./.github/actions/setup-go
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Install GoReleaser
-        uses: goreleaser/goreleaser-action@v3
-        with:
-          distribution: goreleaser-pro
-          version: latest
-          install-only: true
-        env:
-          GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
-      - name: Build Artifacts
-        run: cd cli && make build-lib-turbo-darwin
-        env:
-          GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: turbo-lib-darwin-${{ inputs.release_branch }}
-          path: cli/dist-darwin
+  # darwin:
+  #   needs: [smoke-test]
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         ref: ${{ inputs.release_branch }}
+  #     - run: git fetch origin --tags
+  #     - uses: ./.github/actions/setup-node
+  #       with:
+  #         enable-corepack: false
+  #     - uses: ./.github/actions/setup-go
+  #       with:
+  #         github-token: "${{ secrets.GITHUB_TOKEN }}"
+  #     - name: Install GoReleaser
+  #       uses: goreleaser/goreleaser-action@v3
+  #       with:
+  #         distribution: goreleaser-pro
+  #         version: latest
+  #         install-only: true
+  #       env:
+  #         GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+  #     - name: Build Artifacts
+  #       run: cd cli && make build-lib-turbo-darwin
+  #       env:
+  #         GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+  #     - name: Upload Artifacts
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: turbo-lib-darwin-${{ inputs.release_branch }}
+  #         path: cli/dist-darwin
 
-  # compiles linux and windows in a container
-  cross:
-    needs: [smoke-test]
+  alpine:
+    # needs: [smoke-test]
     runs-on: ubuntu-latest
-    container:
-      image: docker://ghcr.io/vercel/turbo-cross:v1.18.5
+    container: node:alpine
     steps:
+      - run: apk add git go protoc build-base gcc
+      - run: git config --global --add safe.directory /__w/turbo/turbo
       - uses: actions/checkout@v3
         with:
           ref: "${{ inputs.release_branch }}"
       - run: git fetch origin --tags
-      - uses: ./.github/actions/setup-node
-        with:
-          enable-corepack: false
-      - uses: ./.github/actions/setup-go
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Set Up GRPC protobuf
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
+      - run: PATH=$PATH:$HOME/go/bin && protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative cli/internal/turbodprotocol/turbod.proto
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
@@ -83,11 +82,46 @@ jobs:
         env:
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
       - name: Build Artifacts
-        run: cd cli && make build-lib-turbo-cross
+        run: cd cli && go mod tidy && make snapshot-lib-turbo-alpine
         env:
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: turbo-lib-cross-${{ inputs.release_branch }}
-          path: cli/dist-cross
+          name: turbo-lib-alpine-${{ inputs.release_branch }}
+          path: cli/dist-alpine
+
+  # compiles linux and windows in a container
+  # cross:
+  #   needs: [smoke-test]
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: docker://ghcr.io/vercel/turbo-cross:v1.18.5
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         ref: "${{ inputs.release_branch }}"
+  #     - run: git fetch origin --tags
+  #     - uses: ./.github/actions/setup-node
+  #       with:
+  #         enable-corepack: false
+  #     - uses: ./.github/actions/setup-go
+  #       with:
+  #         github-token: "${{ secrets.GITHUB_TOKEN }}"
+  #     - name: Install GoReleaser
+  #       uses: goreleaser/goreleaser-action@v3
+  #       with:
+  #         distribution: goreleaser-pro
+  #         version: latest
+  #         install-only: true
+  #       env:
+  #         GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+  #     - name: Build Artifacts
+  #       run: cd cli && make build-lib-turbo-cross
+  #       env:
+  #         GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+  #     - name: Upload Artifacts
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: turbo-lib-cross-${{ inputs.release_branch }}
+  #         path: cli/dist-cross
