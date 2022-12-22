@@ -23,9 +23,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends musl-tools
-      # this shouldn't be required...
-      - name: Install target
-        run: rustup target add x86_64-unknown-linux-musl
       - uses: actions/checkout@v3
       - name: Download artifact
         id: download-artifact
