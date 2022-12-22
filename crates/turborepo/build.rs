@@ -52,6 +52,8 @@ fn expect_release_lib() -> PathBuf {
     // We expect all artifacts to be in the cli path
     let mut dir = cli_path();
     let target = build_target::target().unwrap();
+    // TODO: make this generic after validation
+    let distro = "alpine";
     let platform = match target.os {
         build_target::Os::MacOs => "darwin",
         build_target::Os::Windows => "windows",
@@ -66,7 +68,7 @@ fn expect_release_lib() -> PathBuf {
     dir.push("libturbo");
     // format is ${BUILD_ID}_${OS}_${ARCH}. Build id is, for goreleaser reasons,
     // turbo-${OS}
-    dir.push(format!("turbo-{platform}_{platform}_{arch}"));
+    dir.push(format!("turbo-{distro}_{platform}_{arch}"));
     dir.push("lib");
     dir
 }
