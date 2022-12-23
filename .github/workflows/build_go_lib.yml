@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     container: node:alpine
     steps:
-      - run: apk add git go protoc build-base gcc musl-dev
+      - run: apk add git go protoc build-base gcc musl-dev libtool g++
       - run: git config --global --add safe.directory /__w/turbo/turbo
       - uses: actions/checkout@v3
         with:
