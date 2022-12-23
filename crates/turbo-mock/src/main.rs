@@ -4,7 +4,7 @@ mod ffi {
 
 use crate::ffi::{nativeRunWithArgs, GoString};
 use anyhow::Result;
-use std::{ffi::CString, process};
+use std::{env, ffi::CString};
 
 fn native_run() -> Result<i32> {
     let json = r#"
@@ -75,13 +75,30 @@ fn native_run() -> Result<i32> {
         n,
     };
     let exit_code = unsafe { nativeRunWithArgs(serialized_args) };
+    println!("exit_code: {}", exit_code);
     Ok(exit_code.try_into()?)
 }
 
 // This function should not expanded. Please add any logic to
 // `turborepo_lib::main` instead
 fn main() {
-    println!("Hello, world 3!");
-    native_run();
-    println!("done!");
+    println!("Running...");
+    let args: Vec<String> = env::args().collect();
+
+    let action = if args.len() > 1 { &args[1] } else { "no-arg" };
+    match action {
+        "run-go" => {
+            println!("run-go");
+            let _ = native_run();
+        }
+        "run-rust" => {
+            println!("run-rust");
+            let result = 1 + 10 / 5;
+            println!("Here's the result of some rust code {}", result);
+        }
+        _ => {
+            println!("received unknown action '{}'", action);
+        }
+    }
+    println!("Done.");
 }
