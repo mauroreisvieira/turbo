@@ -83,8 +83,8 @@ jobs:
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
       - name: Install musl tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends musl-tools
+          apk update
+          apk add gcc musl-dev
       - name: Build Artifacts
         run: cd cli && go mod tidy && make snapshot-lib-turbo-alpine
         env:
