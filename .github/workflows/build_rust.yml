@@ -35,7 +35,7 @@ jobs:
           path: cli/libturbo
           if_no_artifact_found: fail
       - name: Build release binary
-        run: cargo build --release -p turbo-mock --target x86_64-unknown-linux-musl
+        run: RUSTFLAGS="-Ctarget-feature=+crt-static -Clink-self-contained=yes -Clinker=x86_64-alpine-linux-musl-gcc" cargo build --release -p turbo-mock --target x86_64-unknown-linux-musl
       - name: Strip binary from debug symbols
         run: strip target/x86_64-unknown-linux-musl/release/turbo-mock
       - name: Upload Artifacts
