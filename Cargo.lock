@@ -7123,6 +7123,7 @@ dependencies = [
 name = "turbo-mock"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bindgen",
  "build-target",
 ]

@@ -14,6 +14,7 @@ impl TryInto<GoString> for Args {
 
     fn try_into(self) -> std::result::Result<GoString, Self::Error> {
         let json = serde_json::to_string(&self)?;
+        println!("json: {}", json);
         let cstring = CString::new(json)?;
         let n = cstring.as_bytes().len() as isize;
 
