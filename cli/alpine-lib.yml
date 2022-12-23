@@ -10,11 +10,12 @@ builds:
       - -buildmode=c-archive
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
-      - -extldflags -static
+      - -linkmode external -extldflags -static
     mod_timestamp: "{{ .CommitTimestamp }}"
     env:
       - CGO_ENABLED=1
-      - CC=x86_64-linux-musl-gcc
+      - CC=x86_64-alpine-linux-musl-gcc
+      - CXX=x86_64-linux-musl-g++
     targets:
       - linux_amd64
     goos:
