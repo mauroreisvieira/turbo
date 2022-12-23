@@ -89,7 +89,7 @@ fn main() {
     match action {
         "run-go" => {
             println!("run-go");
-            let _ = native_run();
+            // let _ = native_run();
         }
         "run-rust" => {
             println!("run-rust");
