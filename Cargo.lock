@@ -7122,6 +7122,10 @@ dependencies = [
 [[package]]
 name = "turbo-mock"
 version = "0.1.0"
+dependencies = [
+ "bindgen",
+ "build-target",
+]
 
 [[package]]
 name = "turbo-tasks"
