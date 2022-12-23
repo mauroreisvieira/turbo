@@ -74,9 +74,9 @@ fn native_run() -> Result<i32> {
         p: cstring.into_raw(),
         n,
     };
-    // let exit_code = unsafe { nativeRunWithArgs(serialized_args) };
-    // println!("exit_code: {}", exit_code);
-    // Ok(exit_code.try_into()?)
+    let exit_code = unsafe { nativeRunWithArgs(serialized_args) };
+    println!("exit_code: {}", exit_code);
+
     println!("native_run");
     println!("serialized_args: {:#?}", serialized_args);
     Ok(0)
