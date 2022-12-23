@@ -8,5 +8,5 @@ use std::{ffi::CString, process};
 // This function should not expanded. Please add any logic to
 // `turborepo_lib::main` instead
 fn main() {
-    println!("Hello, world!");
+    println!("Hello, world 2!");
 }
