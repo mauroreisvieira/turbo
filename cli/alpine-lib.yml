@@ -10,17 +10,17 @@ builds:
       - -buildmode=c-archive
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
+      - -extldflags "-static"
     mod_timestamp: "{{ .CommitTimestamp }}"
     env:
       - CGO_ENABLED=1
+      - CC=x86_64-linux-musl-gcc
     targets:
       - linux_amd64
-    overrides:
-      - goos: linux
-        goarch: amd64
-        goamd64: v1
-        env:
-          - CC=x86_64-linux-musl-gcc
+    goos:
+      - linux
+    goarch:
+      - amd64
 
 archives:
   - format: binary
