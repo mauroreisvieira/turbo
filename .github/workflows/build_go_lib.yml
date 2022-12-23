@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     container: node:alpine
     steps:
-      - run: apk add git go protoc build-base gcc
+      - run: apk add git go protoc build-base gcc musl-dev
       - run: git config --global --add safe.directory /__w/turbo/turbo
       - uses: actions/checkout@v3
         with:
@@ -81,10 +81,6 @@ jobs:
           install-only: true
         env:
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
-      - name: Install musl tools
-        run: |
-          apk update
-          apk add gcc musl-dev
       - name: Build Artifacts
         run: cd cli && go mod tidy && make snapshot-lib-turbo-alpine
         env:

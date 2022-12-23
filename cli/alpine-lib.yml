@@ -20,7 +20,7 @@ builds:
         goarch: amd64
         goamd64: v1
         env:
-          - CC=x86_64-linux-musl-gcc
+          - CC=musl-gcc
 
 archives:
   - format: binary
