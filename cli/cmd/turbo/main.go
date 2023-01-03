@@ -2,12 +2,8 @@ package main
 
 import "C"
 import (
-	"encoding/json"
 	"fmt"
 	"os"
-
-	"github.com/vercel/turbo/cli/internal/cmd"
-	"github.com/vercel/turbo/cli/internal/turbostate"
 )
 
 func main() {
@@ -17,12 +13,6 @@ func main() {
 
 //export nativeRunWithArgs
 func nativeRunWithArgs(argsString string) C.uint {
-	var args turbostate.ParsedArgsFromRust
-	err := json.Unmarshal([]byte(argsString), &args)
-	if err != nil {
-		fmt.Printf("Error unmarshalling CLI args: %v\n Arg string: %v\n", err, argsString)
-		return 1
-	}
-	exitCode := cmd.RunWithArgs(args, turboVersion)
-	return C.uint(exitCode)
+	fmt.Printf("Args: %v\n", argsString)
+	return C.uint(0)
 }
